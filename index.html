@@ -1,0 +1,2654 @@
+<!DOCTYPE html>
+<!-- SEMAKAN: betulkan kebolehcapaian label pencarian (buang display:none dan tambah kelas .sr-only); tingkatkan ketahanan ralat JS pada borang; selaraskan kemaskini paparan selepas simpan/padam aset dan log penyelenggaraan -->
+<html lang="ms">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistem Inventori Aset - Masjid Kampung Sungai Lang Baru</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- FontAwesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --bg-color: #04140e;
+        --surface-color: #042f24;
+        --surface-hover: #064434;
+        --accent-gold: #d9b96b;
+        --accent-gold-hover: #e5cb8c;
+        --text-cream: #f3ecdc;
+        --text-muted: #a3b899;
+        --border-gold: rgba(217, 185, 107, 0.2);
+        --border-gold-focus: rgba(217, 185, 107, 0.6);
+
+        /* Status Colors */
+        --status-baik: #2e7d32;
+        --status-rosak: #c62828;
+        --status-selenggara: #ef6c00;
+        --status-lupus: #555555;
+
+        /* Fonts */
+        --font-display: "Cormorant Garamond", serif;
+        --font-sans: "Plus Jakarta Sans", sans-serif;
+        --font-arabic: "Amiri", serif;
+
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-cream);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-color);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--surface-color);
+        border: 1px solid var(--border-gold);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-gold);
+      }
+
+      /* Typography */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .arabic-text {
+        font-family: var(--font-arabic);
+        font-size: 1.2rem;
+        color: var(--accent-gold);
+        text-align: center;
+        margin-bottom: 0.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .arabic-text {
+          font-size: 1.5rem;
+        }
+      }
+
+      /* Layout (Mobile-First) */
+      .app-container {
+        display: block;
+      }
+
+      @media (min-width: 1024px) {
+        .app-container {
+          display: grid;
+          grid-template-columns: 280px 1fr;
+          min-height: 100vh;
+        }
+      }
+
+      /* Mobile Top Bar */
+      .mobile-top-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background-color: var(--surface-color);
+        border-bottom: 1px solid var(--border-gold);
+        padding: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .mobile-top-bar img {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1.5px solid var(--accent-gold);
+      }
+
+      .mobile-top-bar h2 {
+        font-size: 1.2rem;
+        color: var(--accent-gold);
+        line-height: 1.1;
+      }
+
+      .mobile-top-bar p {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      @media (min-width: 1024px) {
+        .mobile-top-bar {
+          display: none;
+        }
+      }
+
+      /* Sidebar Navigation (Desktop only) */
+      aside {
+        display: none;
+      }
+
+      @media (min-width: 1024px) {
+        aside {
+          display: flex;
+          background-color: var(--surface-color);
+          border-right: 1px solid var(--border-gold);
+          padding: 2rem 1.5rem;
+          flex-direction: column;
+          justify-content: space-between;
+          position: sticky;
+          top: 0;
+          height: 100vh;
+          z-index: 100;
+        }
+      }
+
+      .brand {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--border-gold);
+        padding-bottom: 1.5rem;
+      }
+
+      .brand img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1.5px solid var(--accent-gold);
+        margin-bottom: 1rem;
+        box-shadow: 0 0 15px rgba(217, 185, 107, 0.2);
+        transition: var(--transition);
+      }
+
+      .brand img:hover {
+        transform: scale(1.05);
+        border-color: var(--accent-gold-hover);
+        box-shadow: 0 0 20px rgba(217, 185, 107, 0.4);
+      }
+
+      .brand h2 {
+        font-size: 1.5rem;
+        color: var(--accent-gold);
+        line-height: 1.2;
+      }
+
+      .brand p {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-top: 0.25rem;
+      }
+
+      .nav-menu {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex-grow: 1;
+      }
+
+      .nav-item button {
+        width: 100%;
+        background: none;
+        border: 1px solid transparent;
+        color: var(--text-cream);
+        padding: 0.8rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: var(--transition);
+        text-align: left;
+      }
+
+      .nav-item button:hover {
+        background-color: var(--surface-hover);
+        border-color: var(--border-gold);
+        color: var(--accent-gold);
+      }
+
+      .nav-item.active button {
+        background-color: var(--accent-gold);
+        color: var(--bg-color);
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(217, 185, 107, 0.2);
+      }
+
+      .sidebar-footer {
+        border-top: 1px solid var(--border-gold);
+        padding-top: 1.5rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      /* Mobile Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background-color: var(--surface-color);
+        border-top: 1px solid var(--border-gold);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 999;
+        padding: 0 10px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      .bottom-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        gap: 4px;
+        transition: var(--transition);
+        height: 100%;
+      }
+
+      .bottom-nav-item i {
+        font-size: 1.15rem;
+      }
+
+      .bottom-nav-item.active {
+        color: var(--accent-gold);
+      }
+
+      .bottom-nav-item.active i {
+        transform: translateY(-2px);
+        color: var(--accent-gold);
+        text-shadow: 0 0 10px rgba(217, 185, 107, 0.3);
+      }
+
+      @media (min-width: 1024px) {
+        .bottom-nav {
+          display: none;
+        }
+      }
+
+      /* Main Content Area */
+      main {
+        padding: 1.5rem 1rem 85px 1rem;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      @media (min-width: 1024px) {
+        main {
+          padding: 2rem 3rem;
+          max-width: 1600px;
+        }
+      }
+
+      /* Header */
+      header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-gold);
+        padding-bottom: 1.2rem;
+        gap: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        header {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          text-align: left;
+          margin-bottom: 2.5rem;
+          padding-bottom: 1.5rem;
+        }
+      }
+
+      .header-title h1 {
+        font-size: 1.8rem;
+        color: var(--text-cream);
+      }
+
+      @media (min-width: 768px) {
+        .header-title h1 {
+          font-size: 2.2rem;
+        }
+      }
+
+      .header-title p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+      }
+
+      @media (min-width: 576px) {
+        .header-actions {
+          width: auto;
+        }
+      }
+
+      /* Buttons */
+      .btn {
+        background-color: var(--surface-color);
+        color: var(--text-cream);
+        border: 1px solid var(--border-gold);
+        padding: 0.75rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+        min-height: 44px; /* Touch target */
+        flex: 1;
+      }
+
+      @media (min-width: 576px) {
+        .btn {
+          flex: none;
+        }
+      }
+
+      .btn:hover {
+        background-color: var(--surface-hover);
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+      }
+
+      .btn-primary {
+        background-color: var(--accent-gold);
+        color: var(--bg-color);
+        border-color: var(--accent-gold);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--accent-gold-hover);
+        color: var(--bg-color);
+        box-shadow: 0 4px 12px rgba(217, 185, 107, 0.3);
+      }
+
+      .btn-danger {
+        background-color: rgba(198, 40, 40, 0.2);
+        color: #ff8a80;
+        border-color: rgba(198, 40, 40, 0.4);
+      }
+
+      .btn-danger:hover {
+        background-color: var(--status-rosak);
+        color: var(--text-cream);
+      }
+
+      /* Dashboard Overview Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .stats-grid {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1.5rem;
+          margin-bottom: 2.5rem;
+        }
+      }
+
+      .stats-grid-double {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .stats-grid-double {
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+          margin-bottom: 2.5rem;
+        }
+      }
+
+      .stat-card {
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-gold);
+        border-radius: 12px;
+        padding: 1.2rem;
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+      }
+
+      @media (min-width: 768px) {
+        .stat-card {
+          padding: 1.5rem;
+        }
+      }
+
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(217, 185, 107, 0.4);
+      }
+
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background-color: var(--accent-gold);
+      }
+
+      .stat-card.baik::before {
+        background-color: var(--status-baik);
+      }
+      .stat-card.rosak::before {
+        background-color: var(--status-rosak);
+      }
+      .stat-card.selenggara::before {
+        background-color: var(--status-selenggara);
+      }
+
+      .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-header i {
+        font-size: 1.1rem;
+        color: var(--accent-gold);
+      }
+
+      .stat-value {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-cream);
+        line-height: 1.1;
+      }
+
+      @media (min-width: 768px) {
+        .stat-value {
+          font-size: 2.2rem;
+        }
+      }
+
+      .stat-desc {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+      }
+
+      /* Dashboard Details Split Grid */
+      .dashboard-details-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      @media (min-width: 1024px) {
+        .dashboard-details-grid {
+          grid-template-columns: 1.5fr 1fr;
+        }
+      }
+
+      /* Filter & Search Bar */
+      .control-panel {
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-gold);
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        .control-panel {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.5rem;
+        }
+      }
+
+      .search-box {
+        position: relative;
+        width: 100%;
+      }
+
+      @media (min-width: 768px) {
+        .search-box {
+          flex-grow: 1;
+          max-width: 450px;
+        }
+      }
+
+      .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+      }
+
+      .search-box input {
+        width: 100%;
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-gold);
+        color: var(--text-cream);
+        padding: 0.75rem 1rem 0.75rem 2.8rem;
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-size: 16px; /* Prevents iOS auto-zoom */
+        transition: var(--transition);
+        min-height: 44px;
+      }
+
+      .search-box input:focus {
+        outline: none;
+        border-color: var(--border-gold-focus);
+        box-shadow: 0 0 0 3px rgba(217, 185, 107, 0.1);
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+      }
+
+      @media (min-width: 768px) {
+        .filter-group {
+          flex-direction: row;
+          width: auto;
+        }
+      }
+
+      .filter-select {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-gold);
+        color: var(--text-cream);
+        padding: 0.75rem 1.5rem 0.75rem 1rem;
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-size: 16px; /* Prevents iOS auto-zoom */
+        cursor: pointer;
+        outline: none;
+        transition: var(--transition);
+        width: 100%;
+        min-height: 44px;
+      }
+
+      @media (min-width: 768px) {
+        .filter-select {
+          width: auto;
+        }
+      }
+
+      .filter-select:focus {
+        border-color: var(--border-gold-focus);
+      }
+
+      /* Responsive Table to Cards on Mobile */
+      .table-container {
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-gold);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .responsive-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .responsive-table th {
+        background-color: rgba(4, 20, 14, 0.6);
+        color: var(--accent-gold);
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid var(--border-gold);
+      }
+
+      .responsive-table td {
+        padding: 1.1rem 1.5rem;
+        border-bottom: 1px solid rgba(217, 185, 107, 0.1);
+        font-size: 0.9rem;
+        vertical-align: middle;
+      }
+
+      .responsive-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .responsive-table tr:hover td {
+        background-color: rgba(217, 185, 107, 0.03);
+      }
+
+      /* Mobile stacked view styling for tables */
+      @media (max-width: 768px) {
+        .responsive-table,
+        .responsive-table thead,
+        .responsive-table tbody,
+        .responsive-table th,
+        .responsive-table td,
+        .responsive-table tr {
+          display: block;
+        }
+
+        .responsive-table thead {
+          display: none; /* Hide table headers on mobile */
+        }
+
+        .responsive-table tr {
+          border-bottom: 1px solid var(--border-gold);
+          padding: 1rem;
+          background-color: rgba(4, 47, 36, 0.3);
+        }
+
+        .responsive-table tr:last-child {
+          border-bottom: none;
+        }
+
+        .responsive-table td {
+          border-bottom: 1px dashed rgba(217, 185, 107, 0.1);
+          padding: 0.6rem 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          text-align: right;
+        }
+
+        .responsive-table td:last-child {
+          border-bottom: none;
+          padding-top: 0.8rem;
+          justify-content: flex-end;
+        }
+
+        .responsive-table td::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: var(--accent-gold);
+          text-align: left;
+          font-size: 0.85rem;
+          margin-right: 1rem;
+        }
+      }
+
+      /* Status & Badges */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .badge-baik {
+        background-color: rgba(46, 125, 50, 0.15);
+        color: #81c784;
+        border: 1px solid rgba(46, 125, 50, 0.3);
+      }
+
+      .badge-rosak {
+        background-color: rgba(198, 40, 40, 0.15);
+        color: #e57373;
+        border: 1px solid rgba(198, 40, 40, 0.3);
+      }
+
+      .badge-selenggara {
+        background-color: rgba(239, 108, 0, 0.15);
+        color: #ffb74d;
+        border: 1px solid rgba(239, 108, 0, 0.3);
+      }
+
+      .badge-lupus {
+        background-color: rgba(120, 120, 120, 0.15);
+        color: #e0e0e0;
+        border: 1px solid rgba(120, 120, 120, 0.3);
+      }
+
+      .badge-wakaf {
+        background-color: rgba(219, 185, 107, 0.15);
+        color: var(--accent-gold);
+        border: 1px solid var(--border-gold);
+      }
+
+      /* Asset Name / Info cell */
+      .asset-info {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .asset-info-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .asset-info-header {
+          justify-content: flex-end;
+        }
+      }
+
+      .asset-title {
+        font-weight: 600;
+        color: var(--text-cream);
+        font-size: 0.95rem;
+      }
+
+      .asset-code {
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.15rem;
+      }
+
+      /* Action Buttons in Table */
+      .table-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .btn-icon {
+        background: none;
+        border: 1px solid var(--border-gold);
+        color: var(--text-muted);
+        width: 38px; /* Enhanced touch target size */
+        height: 38px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .btn-icon:hover {
+        border-color: var(--accent-gold);
+        color: var(--accent-gold);
+        background-color: var(--surface-hover);
+      }
+
+      .btn-icon.delete:hover {
+        border-color: var(--status-rosak);
+        color: #ff8a80;
+        background-color: rgba(198, 40, 40, 0.1);
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(4, 20, 14, 0.85);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        padding: 1rem;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      .modal {
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-gold);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 650px;
+        max-height: 90vh;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .modal-overlay.active .modal {
+        transform: translateY(0);
+      }
+
+      .modal-header {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid var(--border-gold);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(4, 20, 14, 0.4);
+      }
+
+      .modal-header h3 {
+        font-size: 1.3rem;
+        color: var(--accent-gold);
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: var(--transition);
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-close:hover {
+        color: var(--accent-gold);
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .modal-footer {
+        padding: 1.2rem 1.5rem;
+        border-top: 1px solid var(--border-gold);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        background-color: rgba(4, 20, 14, 0.4);
+      }
+
+      /* Form Controls */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      @media (min-width: 600px) {
+        .form-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .form-grid-full {
+          grid-column: span 2;
+        }
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .form-group label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .form-control {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-gold);
+        color: var(--text-cream);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-family: var(--font-sans);
+        font-size: 16px; /* Prevents iOS auto-zoom */
+        outline: none;
+        transition: var(--transition);
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .form-control:focus {
+        border-color: var(--border-gold-focus);
+        box-shadow: 0 0 0 3px rgba(217, 185, 107, 0.15);
+      }
+
+      textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .checkbox-group {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--accent-gold);
+        cursor: pointer;
+      }
+
+      /* Wakaf Info Section in Form */
+      .wakaf-section {
+        border: 1px dashed var(--border-gold);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        background-color: rgba(217, 185, 107, 0.02);
+        display: none;
+      }
+
+      .wakaf-section.active {
+        display: block;
+      }
+
+      /* Maintenance Grid Layout */
+      .maintenance-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      @media (min-width: 1024px) {
+        .maintenance-grid {
+          grid-template-columns: 1fr 1.5fr;
+        }
+      }
+
+      /* Maintenance Logs view specific */
+      .log-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        position: relative;
+        padding-left: 1.5rem;
+      }
+
+      .log-timeline::before {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: var(--border-gold);
+      }
+
+      .log-item {
+        position: relative;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-gold);
+        border-radius: 10px;
+        padding: 1.2rem;
+      }
+
+      .log-item::before {
+        content: "";
+        position: absolute;
+        left: -23px;
+        top: 20px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--accent-gold);
+        border: 2px solid var(--bg-color);
+      }
+
+      .log-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+
+      .log-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        color: var(--accent-gold);
+      }
+
+      .log-desc {
+        font-size: 0.9rem;
+        color: var(--text-cream);
+      }
+
+      .log-cost {
+        display: inline-block;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--accent-gold);
+        background-color: rgba(219, 185, 107, 0.1);
+        padding: 0.1rem 0.5rem;
+        border-radius: 4px;
+      }
+
+      /* Empty state styling */
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: var(--text-muted);
+      }
+
+      .empty-state i {
+        font-size: 2.5rem;
+        color: var(--border-gold);
+        margin-bottom: 1rem;
+      }
+
+      .empty-state h3 {
+        font-size: 1.3rem;
+        color: var(--text-cream);
+        margin-bottom: 0.5rem;
+      }
+
+      /* Keyboard Focus Styling for Accessibility */
+      button:focus-visible,
+      select:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid var(--accent-gold);
+        outline-offset: 2px;
+      }
+
+      /* Screen Reader Only Helper for Accessibility */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* Print styling optimized for Mosque Reports */
+      @media print {
+        body {
+          background-color: #fff;
+          color: #000;
+          font-size: 12pt;
+        }
+
+        .app-container {
+          display: block;
+        }
+
+        aside,
+        .control-panel,
+        .header-actions,
+        .table-actions,
+        .btn,
+        .modal-overlay,
+        .bottom-nav,
+        .mobile-top-bar {
+          display: none !important;
+        }
+
+        main {
+          padding: 0;
+          max-width: 100%;
+        }
+
+        header {
+          border-bottom: 2px solid #000;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+        }
+
+        .header-title h1 {
+          color: #000;
+        }
+
+        .header-title p {
+          color: #555;
+        }
+
+        .table-container {
+          border: 1px solid #000;
+          background: none;
+          box-shadow: none;
+        }
+
+        table {
+          width: 100%;
+        }
+
+        th {
+          background-color: #f0f0f0 !important;
+          color: #000 !important;
+          border-bottom: 2px solid #000;
+        }
+
+        td {
+          color: #000 !important;
+          border-bottom: 1px solid #ccc;
+        }
+
+        .badge {
+          border: 1px solid #000 !important;
+          color: #000 !important;
+          background: none !important;
+          padding: 1px 5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Mobile Top Bar -->
+      <div class="mobile-top-bar">
+        <img
+          src="https://i.postimg.cc/mkZcGzkt/logomkslb-(1).jpg"
+          alt="Logo Masjid Kampung Sungai Lang Baru"
+        />
+        <div>
+          <h2>MKSLB</h2>
+          <p>Masjid Kg. Sungai Lang Baru</p>
+        </div>
+      </div>
+
+      <!-- Sidebar (Desktop) -->
+      <aside>
+        <div class="brand">
+          <img
+            src="https://i.postimg.cc/mkZcGzkt/logomkslb-(1).jpg"
+            alt="Logo Masjid Kampung Sungai Lang Baru"
+          />
+          <h2>MKSLB</h2>
+          <p>Sungai Lang Baru</p>
+        </div>
+
+        <ul class="nav-menu">
+          <li class="nav-item active" id="nav-dashboard">
+            <button onclick="switchView('dashboard')">
+              <i class="fa-solid fa-chart-pie"></i> Ringkasan Utama
+            </button>
+          </li>
+          <li class="nav-item" id="nav-assets">
+            <button onclick="switchView('assets')">
+              <i class="fa-solid fa-boxes-stacked"></i> Senarai Aset
+            </button>
+          </li>
+          <li class="nav-item" id="nav-wakaf">
+            <button onclick="switchView('wakaf')">
+              <i class="fa-solid fa-hand-holding-heart"></i> Rekod Wakaf
+            </button>
+          </li>
+          <li class="nav-item" id="nav-maintenance">
+            <button onclick="switchView('maintenance')">
+              <i class="fa-solid fa-screwdriver-wrench"></i> Penyelenggaraan
+            </button>
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <p>Sistem Pengurusan Aset</p>
+          <p style="color: var(--accent-gold); margin-top: 2px">MKSLB &copy; 2026</p>
+        </div>
+      </aside>
+
+      <!-- Main Workspace -->
+      <main>
+        <!-- Top Header -->
+        <header>
+          <div class="header-title">
+            <div class="arabic-text">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+            <h1 id="view-title">Ringkasan Utama</h1>
+            <p id="view-desc">
+              Gambaran keseluruhan status aset dan statistik semasa Masjid Kampung Sungai Lang Baru.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button class="btn" onclick="printReport()">
+              <i class="fa-solid fa-print"></i> Cetak Laporan
+            </button>
+            <button class="btn btn-primary" onclick="openAssetModal()">
+              <i class="fa-solid fa-plus"></i> Daftar Aset Baru
+            </button>
+          </div>
+        </header>
+
+        <!-- VIEW: DASHBOARD -->
+        <section id="view-section-dashboard">
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span>Jumlah Aset</span>
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-desc">Berdaftar dalam sistem</div>
+            </div>
+            <div class="stat-card baik">
+              <div class="stat-header">
+                <span>Keadaan Baik</span>
+                <i class="fa-solid fa-circle-check" style="color: var(--status-baik)"></i>
+              </div>
+              <div class="stat-value" id="stat-baik" style="color: #81c784">0</div>
+              <div class="stat-desc">Sedia digunakan kariah</div>
+            </div>
+            <div class="stat-card selenggara">
+              <div class="stat-header">
+                <span>Diselenggara</span>
+                <i
+                  class="fa-solid fa-clock-rotate-left"
+                  style="color: var(--status-selenggara)"
+                ></i>
+              </div>
+              <div class="stat-value" id="stat-selenggara" style="color: #ffb74d">0</div>
+              <div class="stat-desc">Sedang diservis / baiki</div>
+            </div>
+            <div class="stat-card rosak">
+              <div class="stat-header">
+                <span>Rosak / Rosak</span>
+                <i class="fa-solid fa-circle-exclamation" style="color: var(--status-rosak)"></i>
+              </div>
+              <div class="stat-value" id="stat-rosak" style="color: #e57373">0</div>
+              <div class="stat-desc">Memerlukan tindakan</div>
+            </div>
+          </div>
+
+          <div class="stats-grid-double">
+            <div class="stat-card" style="border-color: var(--border-gold)">
+              <div class="stat-header">
+                <span>Nilai Anggaran Pelaburan Aset</span>
+                <i class="fa-solid fa-coins"></i>
+              </div>
+              <div class="stat-value" id="stat-value" style="color: var(--accent-gold)">
+                RM 0.00
+              </div>
+              <div class="stat-desc">Anggaran nilai keseluruhan perolehan</div>
+            </div>
+            <div class="stat-card" style="border-color: var(--border-gold)">
+              <div class="stat-header">
+                <span>Aset Hasil Wakaf</span>
+                <i class="fa-solid fa-hand-holding-heart"></i>
+              </div>
+              <div class="stat-value" id="stat-wakaf-count">0</div>
+              <div class="stat-desc">Barangan sumbangan wakaf kariah</div>
+            </div>
+          </div>
+
+          <!-- Recent Activity / Highlights -->
+          <div class="dashboard-details-grid">
+            <div>
+              <h3
+                style="
+                  font-size: 1.6rem;
+                  margin-bottom: 1rem;
+                  color: var(--accent-gold);
+                  border-bottom: 1px solid var(--border-gold);
+                  padding-bottom: 0.5rem;
+                "
+              >
+                Aset Baru Didaftarkan
+              </h3>
+              <div class="table-container" style="margin-bottom: 0">
+                <table id="recent-assets-table" class="responsive-table">
+                  <thead>
+                    <tr>
+                      <th>Nama Aset</th>
+                      <th>Kategori</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Dynamic content -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <h3
+                style="
+                  font-size: 1.6rem;
+                  margin-bottom: 1rem;
+                  color: var(--accent-gold);
+                  border-bottom: 1px solid var(--border-gold);
+                  padding-bottom: 0.5rem;
+                "
+              >
+                Penyelenggaraan Terkini
+              </h3>
+              <div class="log-timeline" id="recent-logs-timeline">
+                <!-- Dynamic content -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW: SENARAI ASET -->
+        <section id="view-section-assets" style="display: none">
+          <!-- Control Panel (Search & Filters) -->
+          <div class="control-panel">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <label for="search-input" class="sr-only">Cari Aset</label>
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Cari nama aset, siri, atau lokasi..."
+                oninput="filterAssets()"
+              />
+            </div>
+            <div class="filter-group">
+              <label for="filter-category" class="sr-only">Kategori</label>
+              <select id="filter-category" class="filter-select" onchange="filterAssets()">
+                <option value="">Semua Kategori</option>
+                <option value="Siaraya & Multimedia">Siaraya & Multimedia</option>
+                <option value="Perabot & Kelengkapan">Perabot & Kelengkapan</option>
+                <option value="Kitab & Bahan Bacaan">Kitab & Bahan Bacaan</option>
+                <option value="Peralatan Dapur">Peralatan Dapur</option>
+                <option value="Kelengkapan Jenazah">Kelengkapan Jenazah</option>
+                <option value="Sistem Penyaman Udara">Sistem Penyaman Udara</option>
+                <option value="Lain-lain">Lain-lain</option>
+              </select>
+              <label for="filter-status" class="sr-only">Status</label>
+              <select id="filter-status" class="filter-select" onchange="filterAssets()">
+                <option value="">Semua Status</option>
+                <option value="Baik">Baik</option>
+                <option value="Rosak">Rosak</option>
+                <option value="Penyelenggaraan">Dalam Penyelenggaraan</option>
+                <option value="Dilupuskan">Dilupuskan</option>
+              </select>
+              <label for="filter-wakaf" class="sr-only">Sumber</label>
+              <select id="filter-wakaf" class="filter-select" onchange="filterAssets()">
+                <option value="">Semua Sumber</option>
+                <option value="wakaf">Hanya Wakaf</option>
+                <option value="beli">Bukan Wakaf (Beli/Sumbangan Am)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Assets Table -->
+          <div class="table-container">
+            <table id="assets-table" class="responsive-table">
+              <thead>
+                <tr>
+                  <th>Nama Aset / Kod</th>
+                  <th>Kategori</th>
+                  <th>Lokasi</th>
+                  <th>Tarikh Perolehan</th>
+                  <th>Kos (RM)</th>
+                  <th>Status</th>
+                  <th style="text-align: right">Tindakan</th>
+                </tr>
+              </thead>
+              <tbody id="assets-table-body">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: REKOD WAKAF -->
+        <section id="view-section-wakaf" style="display: none">
+          <div
+            style="
+              background-color: var(--surface-color);
+              border: 1px solid var(--border-gold);
+              border-radius: 12px;
+              padding: 1.5rem;
+              margin-bottom: 1.5rem;
+              text-align: center;
+            "
+          >
+            <h3 style="font-size: 1.6rem; color: var(--accent-gold); margin-bottom: 0.5rem">
+              Sistem Pengesanan & Penghargaan Wakaf
+            </h3>
+            <p
+              style="color: var(--text-muted); max-width: 700px; margin: 0 auto; font-size: 0.9rem"
+            >
+              "Apabila mati seorang manusia, terputuslah daripadanya amalannya kecuali tiga perkara:
+              sedekah jariah (wakaf), atau ilmu yang dimanfaatkan, atau anak yang soleh yang
+              mendoakan baginya." - (HR Muslim)
+            </p>
+          </div>
+
+          <div class="control-panel">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <label for="wakaf-search" class="sr-only">Cari Pewakaf</label>
+              <input
+                type="text"
+                id="wakaf-search"
+                placeholder="Cari nama pewakaf atau barangan wakaf..."
+                oninput="filterWakaf()"
+              />
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table id="wakaf-table" class="responsive-table">
+              <thead>
+                <tr>
+                  <th>Barangan Wakaf</th>
+                  <th>Nama Pewakaf</th>
+                  <th>Tarikh Wakaf</th>
+                  <th>Kuantiti / Lokasi</th>
+                  <th>Nilai Wakaf (Anggaran)</th>
+                  <th>Catatan Tambahan</th>
+                </tr>
+              </thead>
+              <tbody id="wakaf-table-body">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: MAINTENANCE LOGS -->
+        <section id="view-section-maintenance" style="display: none">
+          <div class="maintenance-grid">
+            <!-- Record Log Form -->
+            <div>
+              <div
+                style="
+                  background-color: var(--surface-color);
+                  border: 1px solid var(--border-gold);
+                  border-radius: 12px;
+                  padding: 1.5rem;
+                "
+              >
+                <h3
+                  style="
+                    font-size: 1.5rem;
+                    color: var(--accent-gold);
+                    margin-bottom: 1.5rem;
+                    border-bottom: 1px solid var(--border-gold);
+                    padding-bottom: 0.5rem;
+                  "
+                >
+                  Rekod Penyelenggaraan
+                </h3>
+
+                <form id="maintenance-form" onsubmit="saveMaintenanceLog(event)">
+                  <div class="form-group" style="margin-bottom: 1rem">
+                    <label for="log-asset-id">Pilih Aset</label>
+                    <select id="log-asset-id" class="form-control" required>
+                      <!-- Dynamic options -->
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 1rem">
+                    <label for="log-title">Jenis Penyelenggaraan / Tugasan</label>
+                    <input
+                      type="text"
+                      id="log-title"
+                      class="form-control"
+                      placeholder="Contoh: Servis Aircond Berkala"
+                      required
+                    />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 1rem">
+                    <label for="log-date">Tarikh Servis/Penyelenggaraan</label>
+                    <input type="date" id="log-date" class="form-control" required />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 1rem">
+                    <label for="log-cost">Kos Penyelenggaraan (RM)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      id="log-cost"
+                      class="form-control"
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 1.5rem">
+                    <label for="log-desc">Butiran / Catatan Servis</label>
+                    <textarea
+                      id="log-desc"
+                      class="form-control"
+                      placeholder="Sila nyatakan apa yang dibaiki atau ditukar..."
+                    ></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="width: 100%">
+                    <i class="fa-solid fa-save"></i> Simpan Rekod Servis
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Log Timeline List -->
+            <div>
+              <h3
+                style="
+                  font-size: 1.6rem;
+                  margin-bottom: 1.5rem;
+                  color: var(--accent-gold);
+                  border-bottom: 1px solid var(--border-gold);
+                  padding-bottom: 0.5rem;
+                "
+              >
+                Log Sejarah Penyelenggaraan
+              </h3>
+              <div class="log-timeline" id="full-logs-timeline">
+                <!-- Dynamic content -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Mobile Bottom Navigation -->
+      <nav class="bottom-nav" aria-label="Menu Utama">
+        <button
+          class="bottom-nav-item active"
+          id="bottom-nav-dashboard"
+          onclick="switchView('dashboard')"
+        >
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Ringkasan</span>
+        </button>
+        <button class="bottom-nav-item" id="bottom-nav-assets" onclick="switchView('assets')">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Aset</span>
+        </button>
+        <button class="bottom-nav-item" id="bottom-nav-wakaf" onclick="switchView('wakaf')">
+          <i class="fa-solid fa-hand-holding-heart"></i>
+          <span>Wakaf</span>
+        </button>
+        <button
+          class="bottom-nav-item"
+          id="bottom-nav-maintenance"
+          onclick="switchView('maintenance')"
+        >
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+          <span>Servis</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- MODAL: ADD / EDIT ASSET -->
+    <div class="modal-overlay" id="asset-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">Daftar Aset Baru</h3>
+          <button class="modal-close" onclick="closeAssetModal()" aria-label="Tutup modal">
+            &times;
+          </button>
+        </div>
+        <form id="asset-form" onsubmit="saveAsset(event)">
+          <input type="hidden" id="asset-id" />
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group form-grid-full">
+                <label for="asset-name">Nama Aset / Peralatan *</label>
+                <input
+                  type="text"
+                  id="asset-name"
+                  class="form-control"
+                  placeholder="Contoh: Van Jenazah Toyota Hiace"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="asset-code">No. Kod / No. Siri Unik *</label>
+                <input
+                  type="text"
+                  id="asset-code"
+                  class="form-control"
+                  placeholder="Contoh: MKSLB/2024/VAN/01"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="asset-category">Kategori Aset *</label>
+                <select id="asset-category" class="form-control" required>
+                  <option value="Siaraya & Multimedia">Siaraya & Multimedia</option>
+                  <option value="Perabot & Kelengkapan">Perabot & Kelengkapan</option>
+                  <option value="Kitab & Bahan Bacaan">Kitab & Bahan Bacaan</option>
+                  <option value="Peralatan Dapur">Peralatan Dapur</option>
+                  <option value="Kelengkapan Jenazah">Kelengkapan Jenazah</option>
+                  <option value="Sistem Penyaman Udara">Sistem Penyaman Udara</option>
+                  <option value="Lain-lain">Lain-lain</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="asset-location">Lokasi Simpanan / Penempatan *</label>
+                <input
+                  type="text"
+                  id="asset-location"
+                  class="form-control"
+                  placeholder="Contoh: Stor Utama / Dewan Solat"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="asset-date">Tarikh Perolehan *</label>
+                <input type="date" id="asset-date" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label for="asset-price">Kos / Nilai Anggaran (RM) *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  id="asset-price"
+                  class="form-control"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="asset-status">Status Semasa *</label>
+                <select id="asset-status" class="form-control" required>
+                  <option value="Baik">Baik / Berfungsi</option>
+                  <option value="Rosak">Rosak</option>
+                  <option value="Penyelenggaraan">Dalam Penyelenggaraan</option>
+                  <option value="Dilupuskan">Dilupuskan</option>
+                </select>
+              </div>
+              <div class="form-group checkbox-group form-grid-full">
+                <input type="checkbox" id="asset-is-wakaf" onchange="toggleWakafFields()" />
+                <label
+                  for="asset-is-wakaf"
+                  style="cursor: pointer; font-weight: 600; color: var(--accent-gold)"
+                  >Adakah barangan ini hasil WAKAF?</label
+                >
+              </div>
+
+              <!-- Wakaf Details -->
+              <div class="form-grid-full wakaf-section" id="wakaf-details-section">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="asset-wakaf-donor">Nama Pewakaf</label>
+                    <input
+                      type="text"
+                      id="asset-wakaf-donor"
+                      class="form-control"
+                      placeholder="Contoh: Wakaf Berkumpulan Kariah Sg. Lang Baru"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="asset-wakaf-date">Tarikh Wakaf Diterima</label>
+                    <input type="date" id="asset-wakaf-date" class="form-control" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group form-grid-full">
+                <label for="asset-notes">Catatan Tambahan / Spesifikasi</label>
+                <textarea
+                  id="asset-notes"
+                  class="form-control"
+                  placeholder="Contoh: Jenama, Model, nama syarikat pembekal atau maklumat waranti..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn" onclick="closeAssetModal()">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan Aset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+      // Memory State (Initial Mock Data suited for Kampung Sungai Lang Baru Mosque)
+      let assets = [
+        {
+          id: "1",
+          name: "Sistem PA & Speaker Dewan Utama",
+          code: "MKSLB/SRY/001",
+          category: "Siaraya & Multimedia",
+          location: "Dewan Solat Utama",
+          date: "2023-05-12",
+          price: 12500.0,
+          status: "Baik",
+          isWakaf: true,
+          wakafDonor: "Haji Ramli bin Ahmad & Keluarga",
+          wakafDate: "2023-05-12",
+          notes: "Jenama Yamaha. Set lengkap mixer, 4 pembesar suara tiang, dan 2 mic tanpa wayar.",
+        },
+        {
+          id: "2",
+          name: "Pendingin Hawa Daikin 2.5HP",
+          code: "MKSLB/AC/005",
+          category: "Sistem Penyaman Udara",
+          location: "Dewan Solat Utama (Kanan)",
+          date: "2022-10-01",
+          price: 3200.0,
+          status: "Penyelenggaraan",
+          isWakaf: false,
+          wakafDonor: "",
+          wakafDate: "",
+          notes: "Sedang diservis kerana masalah gas bocor. Kontraktor: Lang Aircond Services.",
+        },
+        {
+          id: "3",
+          name: "Van Jenazah Toyota Hiace",
+          code: "MKSLB/VNJ/001",
+          category: "Kelengkapan Jenazah",
+          location: "Garaj Van Jenazah",
+          date: "2021-02-15",
+          price: 115000.0,
+          status: "Baik",
+          isWakaf: true,
+          wakafDonor: "Dana Wakaf Kariah & Sumbangan Korporat",
+          wakafDate: "2021-02-15",
+          notes: "Penyelenggaraan berkala setiap 5,000km. Lengkap dengan keranda dan pengusung.",
+        },
+        {
+          id: "4",
+          name: "Karpet Tebal Premium (Saf 1-10)",
+          code: "MKSLB/KRP/010",
+          category: "Perabot & Kelengkapan",
+          location: "Dewan Solat Utama",
+          date: "2023-01-10",
+          price: 45000.0,
+          status: "Baik",
+          isWakaf: true,
+          wakafDonor: "Hajah Aminah binti Kassim (Wakaf Arwah Suami)",
+          wakafDate: "2023-01-10",
+          notes: "Karpet buatan Turki, tebal 16mm. Perlu vakum harian.",
+        },
+        {
+          id: "5",
+          name: "Set Meja Lipat Kuliah (10 Unit)",
+          code: "MKSLB/PBT/022",
+          category: "Perabot & Kelengkapan",
+          location: "Stor Pejabat",
+          date: "2020-06-20",
+          price: 1500.0,
+          status: "Baik",
+          isWakaf: false,
+          wakafDonor: "",
+          wakafDate: "",
+          notes: "Untuk kegunaan kelas pengajian kitab malam dan hujung minggu.",
+        },
+        {
+          id: "6",
+          name: "Projektor Epson EB-X06",
+          code: "MKSLB/SRY/004",
+          category: "Siaraya & Multimedia",
+          location: "Pejabat Masjid / Dewan Kuliah",
+          date: "2022-03-18",
+          price: 2400.0,
+          status: "Rosak",
+          isWakaf: false,
+          wakafDonor: "",
+          wakafDate: "",
+          notes: "Lampu projektor terbakar. Menunggu sebut harga alat ganti.",
+        },
+        {
+          id: "7",
+          name: "Set Pengurusan Jenazah (Kafan & Mandian)",
+          code: "MKSLB/JNZ/003",
+          category: "Kelengkapan Jenazah",
+          location: "Bilik Pengurusan Jenazah",
+          date: "2024-02-01",
+          price: 850.0,
+          status: "Baik",
+          isWakaf: true,
+          wakafDonor: "Hamba Allah",
+          wakafDate: "2024-02-01",
+          notes: "Stok sentiasa dikemas kini. Sumbangan berterusan dari kariah.",
+        },
+      ];
+
+      let maintenanceLogs = [
+        {
+          id: "101",
+          assetId: "2",
+          assetName: "Pendingin Hawa Daikin 2.5HP",
+          title: "Tukar Kapasitor & Isi Gas",
+          date: "2024-05-10",
+          cost: 250.0,
+          desc: "Kipas luar tidak berpusing. Kapasitor didapati kembung dan rosak. Selesai ditukar dan gas diisi semula.",
+        },
+        {
+          id: "102",
+          assetId: "3",
+          assetName: "Van Jenazah Toyota Hiace",
+          title: "Servis Minyak Hitam & Penukaran Brek",
+          date: "2024-04-02",
+          cost: 680.0,
+          desc: "Servis berkala di Bengkel Sg. Lang. Menggunakan minyak semi-sintetik, penukaran pad brek hadapan yang telah haus.",
+        },
+        {
+          id: "103",
+          assetId: "1",
+          assetName: "Sistem PA & Speaker Dewan Utama",
+          title: "Tukar Bateri Mic & Kalibrasi Frekuensi",
+          date: "2024-02-15",
+          cost: 120.0,
+          desc: "Menyelesaikan masalah gangguan bunyi (feedback) dan menukar bateri boleh cas semula untuk kedua-dua mikrofon.",
+        },
+      ];
+
+      let currentView = "dashboard";
+
+      // Initialize application safely
+      window.addEventListener("DOMContentLoaded", () => {
+        try {
+          renderDashboard();
+          populateMaintenanceAssetDropdown();
+          // Default dates to today in forms safely
+          const logDateInput = document.getElementById("log-date");
+          const assetDateInput = document.getElementById("asset-date");
+          if (logDateInput) logDateInput.valueAsDate = new Date();
+          if (assetDateInput) assetDateInput.valueAsDate = new Date();
+        } catch (error) {
+          console.error("Ralat ketika memulakan aplikasi:", error);
+        }
+      });
+
+      // View Switcher
+      function switchView(viewName) {
+        try {
+          currentView = viewName;
+
+          // Update active sidebar item (Desktop)
+          document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
+          const activeNav = document.getElementById(`nav-${viewName}`);
+          if (activeNav) activeNav.classList.add("active");
+
+          // Update active bottom nav item (Mobile)
+          document
+            .querySelectorAll(".bottom-nav-item")
+            .forEach((item) => item.classList.remove("active"));
+          const activeBottomNav = document.getElementById(`bottom-nav-${viewName}`);
+          if (activeBottomNav) activeBottomNav.classList.add("active");
+
+          // Hide all views
+          const views = ["dashboard", "assets", "wakaf", "maintenance"];
+          views.forEach((v) => {
+            const el = document.getElementById(`view-section-${v}`);
+            if (el) el.style.display = "none";
+          });
+
+          // Show active view
+          const activeViewEl = document.getElementById(`view-section-${viewName}`);
+          if (activeViewEl) activeViewEl.style.display = "block";
+
+          // Update titles and descriptions
+          const viewTitle = document.getElementById("view-title");
+          const viewDesc = document.getElementById("view-desc");
+
+          if (viewName === "dashboard") {
+            if (viewTitle) viewTitle.innerText = "Ringkasan Utama";
+            if (viewDesc)
+              viewDesc.innerText =
+                "Gambaran keseluruhan status aset dan statistik semasa Masjid Kampung Sungai Lang Baru.";
+            renderDashboard();
+          } else if (viewName === "assets") {
+            if (viewTitle) viewTitle.innerText = "Senarai Inventori Aset";
+            if (viewDesc)
+              viewDesc.innerText =
+                "Senarai lengkap semua harta, peralatan, dan prasarana milik masjid.";
+            renderAssetsTable(assets);
+          } else if (viewName === "wakaf") {
+            if (viewTitle) viewTitle.innerText = "Rekod Wakaf Kariah";
+            if (viewDesc)
+              viewDesc.innerText =
+                "Penghargaan dan pemantauan harta benda yang diwakafkan oleh ahli kariah demi jariah berterusan.";
+            renderWakafTable(assets.filter((a) => a.isWakaf));
+          } else if (viewName === "maintenance") {
+            if (viewTitle) viewTitle.innerText = "Penyelenggaraan & Servis";
+            if (viewDesc)
+              viewDesc.innerText =
+                "Urus logs pembaikan, penyelenggaraan berkala, dan penambahbaikan prasarana masjid.";
+            renderMaintenanceTimeline();
+            populateMaintenanceAssetDropdown();
+          }
+
+          // Safe scroll to top on mobile view switch
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (error) {
+          console.error("Ralat ketika menukar paparan:", error);
+        }
+      }
+
+      // Dashboard Rendering
+      function renderDashboard() {
+        try {
+          // Stats Calculations
+          const total = assets.length;
+          const baik = assets.filter((a) => a.status === "Baik").length;
+          const rosak = assets.filter((a) => a.status === "Rosak").length;
+          const selenggara = assets.filter((a) => a.status === "Penyelenggaraan").length;
+          const totalValue = assets.reduce((sum, item) => sum + item.price, 0);
+          const wakafCount = assets.filter((a) => a.isWakaf).length;
+
+          const elTotal = document.getElementById("stat-total");
+          const elBaik = document.getElementById("stat-baik");
+          const elRosak = document.getElementById("stat-rosak");
+          const elSelenggara = document.getElementById("stat-selenggara");
+          const elValue = document.getElementById("stat-value");
+          const elWakafCount = document.getElementById("stat-wakaf-count");
+
+          if (elTotal) elTotal.innerText = total;
+          if (elBaik) elBaik.innerText = baik;
+          if (elRosak) elRosak.innerText = rosak;
+          if (elSelenggara) elSelenggara.innerText = selenggara;
+          if (elValue)
+            elValue.innerText = `RM ${totalValue.toLocaleString("ms-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          if (elWakafCount) elWakafCount.innerText = wakafCount;
+
+          // Render Recent Assets Table
+          const recentTableBody = document.querySelector("#recent-assets-table tbody");
+          if (recentTableBody) {
+            recentTableBody.innerHTML = "";
+            // Sort by date acquired (descending) and take top 5
+            const sortedRecent = [...assets]
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .slice(0, 5);
+
+            sortedRecent.forEach((asset) => {
+              const tr = document.createElement("tr");
+              tr.innerHTML = `
+                        <td data-label="Nama Aset">
+                            <div class="asset-info">
+                                <span class="asset-title">${asset.name}</span>
+                                <span class="asset-code">${asset.code}</span>
+                            </div>
+                        </td>
+                        <td data-label="Kategori"><span style="font-size:0.85rem;">${asset.category}</span></td>
+                        <td data-label="Status"><span class="badge badge-${asset.status.toLowerCase()}">${asset.status}</span></td>
+                    `;
+              recentTableBody.appendChild(tr);
+            });
+          }
+
+          // Render Recent Maintenance Logs (Top 3)
+          const recentLogsContainer = document.getElementById("recent-logs-timeline");
+          if (recentLogsContainer) {
+            recentLogsContainer.innerHTML = "";
+            const sortedLogs = [...maintenanceLogs]
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .slice(0, 3);
+
+            if (sortedLogs.length === 0) {
+              recentLogsContainer.innerHTML =
+                '<p style="color: var(--text-muted); font-size: 0.9rem;">Tiada rekod penyelenggaraan terkini.</p>';
+            } else {
+              sortedLogs.forEach((log) => {
+                const logItem = document.createElement("div");
+                logItem.className = "log-item";
+                logItem.innerHTML = `
+                            <div class="log-meta">
+                                <span>${formatDate(log.date)}</span>
+                                <span>Kos: RM ${log.cost.toFixed(2)}</span>
+                            </div>
+                            <div class="log-title">${log.title}</div>
+                            <div class="log-desc" style="font-size: 0.8rem; color: var(--text-muted)">Aset: ${log.assetName}</div>
+                        `;
+                recentLogsContainer.appendChild(logItem);
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Ralat ketika memaparkan papan pemuka:", error);
+        }
+      }
+
+      // Assets Table Rendering
+      function renderAssetsTable(data) {
+        try {
+          const tbody = document.getElementById("assets-table-body");
+          if (!tbody) return;
+          tbody.innerHTML = "";
+
+          if (data.length === 0) {
+            tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-box-open"></i>
+                                    <h3>Tiada Aset Dijumpai</h3>
+                                    <p>Sila tukar penapis carian atau daftar aset yang baru.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+            return;
+          }
+
+          data.forEach((asset) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                        <td data-label="Nama Aset / Kod">
+                            <div class="asset-info">
+                                <div class="asset-info-header">
+                                    <span class="asset-title">${asset.name}</span>
+                                    ${asset.isWakaf ? '<span class="badge badge-wakaf" style="font-size:0.6rem; padding: 1px 4px;">WAKAF</span>' : ""}
+                                </div>
+                                <span class="asset-code">${asset.code}</span>
+                            </div>
+                        </td>
+                        <td data-label="Kategori">${asset.category}</td>
+                        <td data-label="Lokasi"><i class="fa-solid fa-location-dot" style="color: var(--accent-gold); margin-right: 4px;"></i> ${asset.location}</td>
+                        <td data-label="Tarikh Perolehan">${formatDate(asset.date)}</td>
+                        <td data-label="Kos (RM)" style="font-weight: 600;">${asset.price.toLocaleString("ms-MY", { minimumFractionDigits: 2 })}</td>
+                        <td data-label="Status"><span class="badge badge-${asset.status.toLowerCase()}">${asset.status}</span></td>
+                        <td data-label="Tindakan" style="text-align: right;">
+                            <div class="table-actions">
+                                <button class="btn-icon" onclick="openAssetModal('${asset.id}')" title="Kemaskini Aset">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button class="btn-icon delete" onclick="deleteAsset('${asset.id}')" title="Padam Aset">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+            tbody.appendChild(tr);
+          });
+        } catch (error) {
+          console.error("Ralat ketika memaparkan senarai aset:", error);
+        }
+      }
+
+      // Wakaf Table Rendering
+      function renderWakafTable(data) {
+        try {
+          const tbody = document.getElementById("wakaf-table-body");
+          if (!tbody) return;
+          tbody.innerHTML = "";
+
+          if (data.length === 0) {
+            tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-heart"></i>
+                                    <h3>Tiada Rekod Wakaf</h3>
+                                    <p>Tiada barangan berdaftar sebagai sumbangan wakaf buat masa ini.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+            return;
+          }
+
+          data.forEach((asset) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                        <td data-label="Barangan Wakaf">
+                            <div class="asset-info">
+                                <span class="asset-title" style="color: var(--accent-gold);">${asset.name}</span>
+                                <span class="asset-code">${asset.code}</span>
+                            </div>
+                        </td>
+                        <td data-label="Nama Pewakaf" style="font-weight: 600; color: var(--text-cream);">${asset.wakafDonor || "Hamba Allah"}</td>
+                        <td data-label="Tarikh Wakaf">${asset.wakafDate ? formatDate(asset.wakafDate) : formatDate(asset.date)}</td>
+                        <td data-label="Kuantiti / Lokasi">
+                            <div><i class="fa-solid fa-map-pin" style="color: var(--accent-gold); width: 15px;"></i> ${asset.location}</div>
+                        </td>
+                        <td data-label="Nilai Wakaf" style="font-weight: 600; color: #81c784;">RM ${asset.price.toLocaleString("ms-MY", { minimumFractionDigits: 2 })}</td>
+                        <td data-label="Catatan Tambahan" style="font-size: 0.85rem; color: var(--text-muted); max-width: 250px; white-space: normal;">${asset.notes || "-"}</td>
+                    `;
+            tbody.appendChild(tr);
+          });
+        } catch (error) {
+          console.error("Ralat ketika memaparkan senarai wakaf:", error);
+        }
+      }
+
+      // Maintenance Log View Rendering
+      function renderMaintenanceTimeline() {
+        try {
+          const timeline = document.getElementById("full-logs-timeline");
+          if (!timeline) return;
+          timeline.innerHTML = "";
+
+          if (maintenanceLogs.length === 0) {
+            timeline.innerHTML = `
+                        <div class="empty-state" style="padding: 2rem 0;">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                            <h3>Tiada Rekod Servis</h3>
+                            <p>Semua peralatan dalam keadaan baik tanpa rekod kerosakan.</p>
+                        </div>
+                    `;
+            return;
+          }
+
+          // Sort logs by date descending
+          const sorted = [...maintenanceLogs].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+          sorted.forEach((log) => {
+            const logItem = document.createElement("div");
+            logItem.className = "log-item";
+            logItem.innerHTML = `
+                        <div class="log-meta">
+                            <span><i class="fa-solid fa-calendar"></i> ${formatDate(log.date)}</span>
+                            <span class="log-cost">Kos: RM ${log.cost.toFixed(2)}</span>
+                        </div>
+                        <div class="log-title">${log.title}</div>
+                        <div style="font-size: 0.85rem; color: var(--accent-gold); margin-bottom: 0.5rem;">
+                            <i class="fa-solid fa-tag"></i> Aset: <strong>${log.assetName}</strong>
+                        </div>
+                        <div class="log-desc">${log.desc}</div>
+                        <button class="btn-icon delete" onclick="deleteMaintenanceLog('${log.id}')" style="position: absolute; right: 15px; bottom: 15px; width: 34px; height: 34px;" title="Padam Log">
+                            <i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i>
+                        </button>
+                    `;
+            timeline.appendChild(logItem);
+          });
+        } catch (error) {
+          console.error("Ralat ketika memaparkan log penyelenggaraan:", error);
+        }
+      }
+
+      // Populating Asset Dropdown in Maintenance Log Form
+      function populateMaintenanceAssetDropdown() {
+        try {
+          const dropdown = document.getElementById("log-asset-id");
+          if (!dropdown) return;
+          dropdown.innerHTML = '<option value="">-- Pilih Aset Terlibat --</option>';
+
+          // Only list assets that are not disposed
+          assets
+            .filter((a) => a.status !== "Dilupuskan")
+            .forEach((asset) => {
+              const option = document.createElement("option");
+              option.value = asset.id;
+              option.innerText = `${asset.name} (${asset.code})`;
+              dropdown.appendChild(option);
+            });
+        } catch (error) {
+          console.error("Ralat ketika memuatkan senarai pilihan aset:", error);
+        }
+      }
+
+      // Filter Logic for Assets
+      function filterAssets() {
+        try {
+          const queryEl = document.getElementById("search-input");
+          const categoryEl = document.getElementById("filter-category");
+          const statusEl = document.getElementById("filter-status");
+          const wakafFilterEl = document.getElementById("filter-wakaf");
+
+          const query = queryEl ? queryEl.value.toLowerCase() : "";
+          const category = categoryEl ? categoryEl.value : "";
+          const status = statusEl ? statusEl.value : "";
+          const wakafFilter = wakafFilterEl ? wakafFilterEl.value : "";
+
+          const filtered = assets.filter((asset) => {
+            const matchesSearch =
+              asset.name.toLowerCase().includes(query) ||
+              asset.code.toLowerCase().includes(query) ||
+              asset.location.toLowerCase().includes(query);
+
+            const matchesCategory = category === "" || asset.category === category;
+            const matchesStatus = status === "" || asset.status === status;
+
+            let matchesWakaf = true;
+            if (wakafFilter === "wakaf") {
+              matchesWakaf = asset.isWakaf === true;
+            } else if (wakafFilter === "beli") {
+              matchesWakaf = asset.isWakaf !== true;
+            }
+
+            return matchesSearch && matchesCategory && matchesStatus && matchesWakaf;
+          });
+
+          renderAssetsTable(filtered);
+        } catch (error) {
+          console.error("Ralat ketika menapis senarai aset:", error);
+        }
+      }
+
+      // Filter Logic for Wakaf View
+      function filterWakaf() {
+        try {
+          const searchEl = document.getElementById("wakaf-search");
+          const query = searchEl ? searchEl.value.toLowerCase() : "";
+          const wakafAssets = assets.filter((a) => a.isWakaf);
+
+          const filtered = wakafAssets.filter((asset) => {
+            return (
+              asset.name.toLowerCase().includes(query) ||
+              (asset.wakafDonor && asset.wakafDonor.toLowerCase().includes(query)) ||
+              asset.location.toLowerCase().includes(query)
+            );
+          });
+
+          renderWakafTable(filtered);
+        } catch (error) {
+          console.error("Ralat ketika menapis senarai wakaf:", error);
+        }
+      }
+
+      // Open Asset Registration / Edit Modal (Replaces old broken editAsset call)
+      function openAssetModal(assetId = null) {
+        try {
+          const modal = document.getElementById("asset-modal");
+          const form = document.getElementById("asset-form");
+          const title = document.getElementById("modal-title");
+
+          if (!modal || !form || !title) return;
+
+          form.reset();
+          document.getElementById("asset-id").value = "";
+          const wakafSect = document.getElementById("wakaf-details-section");
+          if (wakafSect) wakafSect.classList.remove("active");
+          const assetDateEl = document.getElementById("asset-date");
+          if (assetDateEl) assetDateEl.valueAsDate = new Date();
+
+          if (assetId) {
+            // Edit mode
+            const asset = assets.find((a) => a.id === assetId);
+            if (asset) {
+              title.innerText = "Kemaskini Maklumat Aset";
+              document.getElementById("asset-id").value = asset.id || "";
+              document.getElementById("asset-name").value = asset.name || "";
+              document.getElementById("asset-code").value = asset.code || "";
+              document.getElementById("asset-category").value = asset.category || "";
+              document.getElementById("asset-location").value = asset.location || "";
+              document.getElementById("asset-date").value = asset.date || "";
+              document.getElementById("asset-price").value = asset.price || 0;
+              document.getElementById("asset-status").value = asset.status || "Baik";
+              document.getElementById("asset-is-wakaf").checked = !!asset.isWakaf;
+              document.getElementById("asset-notes").value = asset.notes || "";
+
+              if (asset.isWakaf) {
+                if (wakafSect) wakafSect.classList.add("active");
+                const donorEl = document.getElementById("asset-wakaf-donor");
+                const wDateEl = document.getElementById("asset-wakaf-date");
+                if (donorEl) donorEl.value = asset.wakafDonor || "";
+                if (wDateEl) wDateEl.value = asset.wakafDate || "";
+              } else {
+                if (wakafSect) wakafSect.classList.remove("active");
+                const donorEl = document.getElementById("asset-wakaf-donor");
+                const wDateEl = document.getElementById("asset-wakaf-date");
+                if (donorEl) donorEl.value = "";
+                if (wDateEl) wDateEl.value = "";
+              }
+            }
+          } else {
+            title.innerText = "Daftar Aset Baru";
+          }
+
+          modal.classList.add("active");
+        } catch (error) {
+          console.error("Ralat ketika membuka borang aset:", error);
+        }
+      }
+
+      function closeAssetModal() {
+        const modal = document.getElementById("asset-modal");
+        if (modal) modal.classList.remove("active");
+      }
+
+      // Toggle Wakaf Fields in Modal Form
+      function toggleWakafFields() {
+        try {
+          const isWakafEl = document.getElementById("asset-is-wakaf");
+          const isWakaf = isWakafEl ? isWakafEl.checked : false;
+          const section = document.getElementById("wakaf-details-section");
+          if (section) {
+            if (isWakaf) {
+              section.classList.add("active");
+              // Auto fill wakaf date from purchase date if empty
+              const wDateEl = document.getElementById("asset-wakaf-date");
+              const aDateEl = document.getElementById("asset-date");
+              if (wDateEl && aDateEl && !wDateEl.value) {
+                wDateEl.value = aDateEl.value;
+              }
+            } else {
+              section.classList.remove("active");
+            }
+          }
+        } catch (error) {
+          console.error("Ralat ketika menukar tetapan wakaf:", error);
+        }
+      }
+
+      // Save Asset (Create / Update)
+      function saveAsset(e) {
+        try {
+          e.preventDefault();
+
+          const idEl = document.getElementById("asset-id");
+          const nameEl = document.getElementById("asset-name");
+          const codeEl = document.getElementById("asset-code");
+          const categoryEl = document.getElementById("asset-category");
+          const locationEl = document.getElementById("asset-location");
+          const dateEl = document.getElementById("asset-date");
+          const priceEl = document.getElementById("asset-price");
+          const statusEl = document.getElementById("asset-status");
+          const isWakafEl = document.getElementById("asset-is-wakaf");
+          const notesEl = document.getElementById("asset-notes");
+
+          if (
+            !nameEl ||
+            !codeEl ||
+            !categoryEl ||
+            !locationEl ||
+            !dateEl ||
+            !priceEl ||
+            !statusEl
+          ) {
+            console.error("Elemen borang tidak lengkap.");
+            return;
+          }
+
+          const id = idEl ? idEl.value : "";
+          const name = nameEl.value;
+          const code = codeEl.value;
+          const category = categoryEl.value;
+          const location = locationEl.value;
+          const date = dateEl.value;
+          const price = parseFloat(priceEl.value) || 0;
+          const status = statusEl.value;
+          const isWakaf = isWakafEl ? isWakafEl.checked : false;
+          const notes = notesEl ? notesEl.value : "";
+
+          let wakafDonor = "";
+          let wakafDate = "";
+
+          if (isWakaf) {
+            const donorEl = document.getElementById("asset-wakaf-donor");
+            const wDateEl = document.getElementById("asset-wakaf-date");
+            wakafDonor = donorEl ? donorEl.value || "Hamba Allah" : "Hamba Allah";
+            wakafDate = wDateEl ? wDateEl.value || date : date;
+          }
+
+          if (id) {
+            // Update existing
+            const index = assets.findIndex((a) => a.id === id);
+            if (index !== -1) {
+              assets[index] = {
+                ...assets[index],
+                name,
+                code,
+                category,
+                location,
+                date,
+                price,
+                status,
+                isWakaf,
+                wakafDonor,
+                wakafDate,
+                notes,
+              };
+              alert("Aset berjaya dikemaskini.");
+            }
+          } else {
+            // Create new
+            const newAsset = {
+              id: Date.now().toString(),
+              name,
+              code,
+              category,
+              location,
+              date,
+              price,
+              status,
+              isWakaf,
+              wakafDonor,
+              wakafDate,
+              notes,
+            };
+            assets.push(newAsset);
+            alert("Aset baru berjaya didaftarkan.");
+          }
+
+          closeAssetModal();
+          populateMaintenanceAssetDropdown();
+
+          // Refresh current view
+          if (currentView === "dashboard") {
+            renderDashboard();
+          } else if (currentView === "assets") {
+            renderAssetsTable(assets);
+          } else if (currentView === "wakaf") {
+            renderWakafTable(assets.filter((a) => a.isWakaf));
+          } else if (currentView === "maintenance") {
+            renderMaintenanceTimeline();
+          }
+        } catch (error) {
+          console.error("Ralat ketika menyimpan maklumat aset:", error);
+        }
+      }
+
+      // Delete Asset
+      function deleteAsset(id) {
+        try {
+          const asset = assets.find((a) => a.id === id);
+          if (!asset) return;
+
+          if (
+            confirm(
+              `Adakah anda pasti mahu memadam aset "${asset.name}"? Semua rekod berkaitan akan dipadam.`,
+            )
+          ) {
+            assets = assets.filter((a) => a.id !== id);
+            // Also clean up maintenance logs for this asset
+            maintenanceLogs = maintenanceLogs.filter((log) => log.assetId !== id);
+
+            alert("Aset berjaya dipadam.");
+            populateMaintenanceAssetDropdown();
+
+            if (currentView === "dashboard") {
+              renderDashboard();
+            } else if (currentView === "assets") {
+              renderAssetsTable(assets);
+            } else if (currentView === "wakaf") {
+              renderWakafTable(assets.filter((a) => a.isWakaf));
+            } else if (currentView === "maintenance") {
+              renderMaintenanceTimeline();
+            }
+          }
+        } catch (error) {
+          console.error("Ralat ketika memadam aset:", error);
+        }
+      }
+
+      // Save Maintenance Log
+      function saveMaintenanceLog(e) {
+        try {
+          e.preventDefault();
+
+          const assetIdEl = document.getElementById("log-asset-id");
+          const titleEl = document.getElementById("log-title");
+          const dateEl = document.getElementById("log-date");
+          const costEl = document.getElementById("log-cost");
+          const descEl = document.getElementById("log-desc");
+
+          if (!assetIdEl || !titleEl || !dateEl || !costEl) {
+            console.error("Elemen borang penyelenggaraan tidak lengkap.");
+            return;
+          }
+
+          const assetId = assetIdEl.value;
+          const title = titleEl.value;
+          const date = dateEl.value;
+          const cost = parseFloat(costEl.value) || 0;
+          const desc = descEl ? descEl.value : "";
+
+          if (!assetId) {
+            alert("Sila pilih aset yang terlibat.");
+            return;
+          }
+
+          const asset = assets.find((a) => a.id === assetId);
+          if (!asset) return;
+
+          const newLog = {
+            id: Date.now().toString(),
+            assetId,
+            assetName: asset.name,
+            title,
+            date,
+            cost,
+            desc,
+          };
+
+          maintenanceLogs.push(newLog);
+
+          // Automatically set asset status to 'Baik' or keep 'Penyelenggaraan' based on logic.
+          if (
+            confirm("Adakah penyelenggaraan ini telah selesai dan aset kini dalam keadaan BAIK?")
+          ) {
+            asset.status = "Baik";
+          } else {
+            asset.status = "Penyelenggaraan";
+          }
+
+          alert("Rekod penyelenggaraan berjaya disimpan.");
+          const mForm = document.getElementById("maintenance-form");
+          if (mForm) mForm.reset();
+          const logDateEl = document.getElementById("log-date");
+          if (logDateEl) logDateEl.valueAsDate = new Date();
+
+          renderMaintenanceTimeline();
+        } catch (error) {
+          console.error("Ralat ketika menyimpan log penyelenggaraan:", error);
+        }
+      }
+
+      // Delete Maintenance Log
+      function deleteMaintenanceLog(id) {
+        try {
+          if (confirm("Adakah anda pasti mahu memadam log penyelenggaraan ini?")) {
+            maintenanceLogs = maintenanceLogs.filter((log) => log.id !== id);
+
+            if (currentView === "dashboard") {
+              renderDashboard();
+            } else if (currentView === "maintenance") {
+              renderMaintenanceTimeline();
+            }
+          }
+        } catch (error) {
+          console.error("Ralat ketika memadam log penyelenggaraan:", error);
+        }
+      }
+
+      // Utility: Date Formatter (Malay style e.g. 12 Mei 2024) - Made Robust against timezone offsets
+      function formatDate(dateString) {
+        try {
+          if (!dateString) return "-";
+          const months = [
+            "Januari",
+            "Februari",
+            "Mac",
+            "April",
+            "Mei",
+            "Jun",
+            "Julai",
+            "Ogos",
+            "September",
+            "Oktober",
+            "November",
+            "Disember",
+          ];
+
+          // Split elements to bypass timezone shift issues
+          const parts = dateString.split("-");
+          if (parts.length === 3) {
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            if (!isNaN(day) && !isNaN(month) && !isNaN(year) && month >= 0 && month < 12) {
+              return `${day} ${months[month]} ${year}`;
+            }
+          }
+
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return dateString;
+          return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        } catch (e) {
+          return dateString || "-";
+        }
+      }
+
+      // Print Report Action
+      function printReport() {
+        window.print();
+      }
+    </script>
+  </body>
+</html>
