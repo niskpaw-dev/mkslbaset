@@ -1457,7 +1457,7 @@
                   <th>Nama Aset / Kod</th>
                   <th>Kategori</th>
                   <th>Lokasi</th>
-                  <th>Tarikh Perolehan</th>
+                  <th>Tarikh Beli / Terima</th>
                   <th>Kos (RM)</th>
                   <th>Status</th>
                   <th style="text-align: right">Tindakan</th>
@@ -1704,7 +1704,20 @@
                 />
               </div>
               <div class="form-group">
-                <label for="asset-date">Tarikh Perolehan *</label>
+                <label for="asset-status">Status Semasa *</label>
+                <select id="asset-status" class="form-control" required>
+                  <option value="Baik">Baik / Berfungsi</option>
+                  <option value="Rosak">Rosak</option>
+                  <option value="Penyelenggaraan">Dalam Penyelenggaraan</option>
+                  <option value="Dilupuskan">Dilupuskan</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="asset-purchase-date">Tarikh Beli / Perolehan Asal *</label>
+                <input type="date" id="asset-purchase-date" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label for="asset-date">Tarikh Terima / Daftar *</label>
                 <input type="date" id="asset-date" class="form-control" required />
               </div>
               <div class="form-group">
@@ -1717,15 +1730,6 @@
                   placeholder="0.00"
                   required
                 />
-              </div>
-              <div class="form-group">
-                <label for="asset-status">Status Semasa *</label>
-                <select id="asset-status" class="form-control" required>
-                  <option value="Baik">Baik / Berfungsi</option>
-                  <option value="Rosak">Rosak</option>
-                  <option value="Penyelenggaraan">Dalam Penyelenggaraan</option>
-                  <option value="Dilupuskan">Dilupuskan</option>
-                </select>
               </div>
               <div class="form-group checkbox-group form-grid-full">
                 <input type="checkbox" id="asset-is-wakaf" onchange="toggleWakafFields()" />
@@ -1784,6 +1788,7 @@
           category: "Siaraya & Multimedia",
           location: "Dewan Solat Utama",
           date: "2023-05-12",
+          purchaseDate: "2023-05-10",
           price: 12500.0,
           status: "Baik",
           isWakaf: true,
@@ -1798,6 +1803,7 @@
           category: "Sistem Penyaman Udara",
           location: "Dewan Solat Utama (Kanan)",
           date: "2022-10-01",
+          purchaseDate: "2022-09-28",
           price: 3200.0,
           status: "Penyelenggaraan",
           isWakaf: false,
@@ -1812,6 +1818,7 @@
           category: "Kelengkapan Jenazah",
           location: "Garaj Van Jenazah",
           date: "2021-02-15",
+          purchaseDate: "2021-02-10",
           price: 115000.0,
           status: "Baik",
           isWakaf: true,
@@ -1826,6 +1833,7 @@
           category: "Perabot & Kelengkapan",
           location: "Dewan Solat Utama",
           date: "2023-01-10",
+          purchaseDate: "2023-01-05",
           price: 45000.0,
           status: "Baik",
           isWakaf: true,
@@ -1840,6 +1848,7 @@
           category: "Perabot & Kelengkapan",
           location: "Stor Pejabat",
           date: "2020-06-20",
+          purchaseDate: "2020-06-15",
           price: 1500.0,
           status: "Baik",
           isWakaf: false,
@@ -1854,6 +1863,7 @@
           category: "Siaraya & Multimedia",
           location: "Pejabat Masjid / Dewan Kuliah",
           date: "2022-03-18",
+          purchaseDate: "2022-03-15",
           price: 2400.0,
           status: "Rosak",
           isWakaf: false,
@@ -1868,6 +1878,7 @@
           category: "Kelengkapan Jenazah",
           location: "Bilik Pengurusan Jenazah",
           date: "2024-02-01",
+          purchaseDate: "2024-01-28",
           price: 850.0,
           status: "Baik",
           isWakaf: true,
@@ -1917,8 +1928,10 @@
           // Default dates to today in forms safely
           const logDateInput = document.getElementById("log-date");
           const assetDateInput = document.getElementById("asset-date");
+          const assetPurchaseDateInput = document.getElementById("asset-purchase-date");
           if (logDateInput) logDateInput.valueAsDate = new Date();
           if (assetDateInput) assetDateInput.valueAsDate = new Date();
+          if (assetPurchaseDateInput) assetPurchaseDateInput.valueAsDate = new Date();
         } catch (error) {
           console.error("Ralat ketika memulakan aplikasi:", error);
         }
@@ -2109,7 +2122,10 @@
                         </td>
                         <td data-label="Kategori">${asset.category}</td>
                         <td data-label="Lokasi"><i class="fa-solid fa-location-dot" style="color: var(--accent-gold); margin-right: 4px;"></i> ${asset.location}</td>
-                        <td data-label="Tarikh Perolehan">${formatDate(asset.date)}</td>
+                        <td data-label="Tarikh Beli / Terima">
+                            <div style="font-size: 0.85rem; font-weight: 500;">Beli: ${formatDate(asset.purchaseDate || asset.date)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Terima: ${formatDate(asset.date)}</div>
+                        </td>
                         <td data-label="Kos (RM)" style="font-weight: 600;">${asset.price.toLocaleString("ms-MY", { minimumFractionDigits: 2 })}</td>
                         <td data-label="Status"><span class="badge badge-${asset.status.toLowerCase()}">${asset.status}</span></td>
                         <td data-label="Tindakan" style="text-align: right;">
@@ -2301,7 +2317,7 @@
         }
       }
 
-      // Open Asset Registration / Edit Modal (Replaces old broken editAsset call)
+      // Open Asset Registration / Edit Modal
       function openAssetModal(assetId = null) {
         try {
           const modal = document.getElementById("asset-modal");
@@ -2314,8 +2330,11 @@
           document.getElementById("asset-id").value = "";
           const wakafSect = document.getElementById("wakaf-details-section");
           if (wakafSect) wakafSect.classList.remove("active");
+
           const assetDateEl = document.getElementById("asset-date");
+          const assetPurchaseDateEl = document.getElementById("asset-purchase-date");
           if (assetDateEl) assetDateEl.valueAsDate = new Date();
+          if (assetPurchaseDateEl) assetPurchaseDateEl.valueAsDate = new Date();
 
           if (assetId) {
             // Edit mode
@@ -2328,6 +2347,8 @@
               document.getElementById("asset-category").value = asset.category || "";
               document.getElementById("asset-location").value = asset.location || "";
               document.getElementById("asset-date").value = asset.date || "";
+              document.getElementById("asset-purchase-date").value =
+                asset.purchaseDate || asset.date || "";
               document.getElementById("asset-price").value = asset.price || 0;
               document.getElementById("asset-status").value = asset.status || "Baik";
               document.getElementById("asset-is-wakaf").checked = !!asset.isWakaf;
@@ -2397,6 +2418,7 @@
           const categoryEl = document.getElementById("asset-category");
           const locationEl = document.getElementById("asset-location");
           const dateEl = document.getElementById("asset-date");
+          const purchaseDateEl = document.getElementById("asset-purchase-date");
           const priceEl = document.getElementById("asset-price");
           const statusEl = document.getElementById("asset-status");
           const isWakafEl = document.getElementById("asset-is-wakaf");
@@ -2408,6 +2430,7 @@
             !categoryEl ||
             !locationEl ||
             !dateEl ||
+            !purchaseDateEl ||
             !priceEl ||
             !statusEl
           ) {
@@ -2421,6 +2444,7 @@
           const category = categoryEl.value;
           const location = locationEl.value;
           const date = dateEl.value;
+          const purchaseDate = purchaseDateEl.value;
           const price = parseFloat(priceEl.value) || 0;
           const status = statusEl.value;
           const isWakaf = isWakafEl ? isWakafEl.checked : false;
@@ -2447,6 +2471,7 @@
                 category,
                 location,
                 date,
+                purchaseDate,
                 price,
                 status,
                 isWakaf,
@@ -2465,6 +2490,7 @@
               category,
               location,
               date,
+              purchaseDate,
               price,
               status,
               isWakaf,
